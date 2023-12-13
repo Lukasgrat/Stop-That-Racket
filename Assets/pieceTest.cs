@@ -7,6 +7,7 @@ public class pieceTest : MonoBehaviour
 {
     public Sprite regularSprite;
     public Sprite highlightedSprite;
+    public GameObject LevelManager;
     private bool isSelected;
     Camera m_Camera;
     // Start is called before the first frame update
@@ -35,11 +36,19 @@ public class pieceTest : MonoBehaviour
                 if (isSelected)
                 {
                     var movePosition = Camera.main.ScreenToWorldPoint(Input.mousePosition);
-                    transform.position = new Vector3(movePosition.x,movePosition.y,0);
+                    var nextPosition = new Vector3(movePosition.x,movePosition.y,0);
+                    movePlayer(nextPosition);
                 }
                 spriteRender.sprite = regularSprite;
                 isSelected = false;
             }
+        }
+    }
+    void movePlayer(Vector3 pos)
+    {
+        if (LevelManager.GetComponent<Level_Manager>().increase_AP(-1))
+        {
+            transform.position = pos;
         }
     }
 }
