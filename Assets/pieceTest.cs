@@ -34,7 +34,8 @@ public class pieceTest : MonoBehaviour
             {
                 if (isSelected)
                 {
-                    transform.position = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+                    var movePosition = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+                    transform.position = new Vector3(movePosition.x,movePosition.y,0);
                 }
                 spriteRender.sprite = regularSprite;
                 isSelected = false;
