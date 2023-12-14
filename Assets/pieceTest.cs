@@ -27,48 +27,48 @@ public class pieceTest : MonoBehaviour
     {
         if (Input.GetMouseButtonDown(0))
         {
-            var spriteRender = GetComponent<SpriteRenderer>();
-            bool wasHit = false;
-            Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
-            RaycastHit2D[] hits = Physics2D.GetRayIntersectionAll(ray, Mathf.Infinity);
-            foreach (var hit in hits)
-            {
-                if (hit.collider.name == name)
-                {
-                    Debug.Log("Target Position: " + hit.collider.gameObject.transform.position);
-                    spriteRender.sprite = highlightedSprite;
-                    isSelected = true;
-                    wasHit = true;
-                }
-            }
-            if(! wasHit)
-            {   
-                if(hits.Length > 0) { 
-                    int index = roomIndex(currentRoom.GetComponent<gameRoom>().neighborRooms, hits[0]);
-                    if (isSelected && index != -1)
-                    {
-                        currentRoom = currentRoom.GetComponent<gameRoom>().neighborRooms[index];
-                        if (charcter_ID < currentRoom.GetComponent<gameRoom>().characterPositions.Length)
-                        {
-                            movePlayer(currentRoom.transform.position + (currentRoom.GetComponent<gameRoom>().characterPositions)[charcter_ID]);
-                        }
-                        else
-                        {
-                            movePlayer(currentRoom.transform.position);
-                        }
-
-                    }
-                }
-                spriteRender.sprite = regularSprite;
-                isSelected = false;
-            }
+            mouseHandler();
         }
     }
-    void movePlayer(Vector3 pos)
+    void mouseHandler()
     {
-        if (LevelManager.GetComponent<Level_Manager>().increase_AP(-1))
+        var spriteRender = GetComponent<SpriteRenderer>();
+        bool wasHit = false;
+        Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+        RaycastHit2D[] hits = Physics2D.GetRayIntersectionAll(ray, Mathf.Infinity);
+        foreach (var hit in hits)
         {
-            transform.position = pos;
+            if (hit.collider.name == name)
+            {
+                spriteRender.sprite = highlightedSprite;
+                isSelected = true;
+                wasHit = true;
+            }
+        }
+        if (!wasHit)
+        {
+            if (hits.Length > 0 && isSelected)
+            {
+                int index = roomIndex(currentRoom.GetComponent<gameRoom>().neighborRooms, hits[0]);
+                movePlayer(index);
+            }
+            spriteRender.sprite = regularSprite;
+            isSelected = false;
+        }
+    }
+    // Given the index of a room, attempts to move the player into that room.
+    // Does not move the player there if the player can't lose 1 AP or there is an invalid index
+    void movePlayer(int index)
+    {
+        if (index != -1 && LevelManager.GetComponent<Level_Manager>().increase_AP(-1))
+        {
+            currentRoom = currentRoom.GetComponent<gameRoom>().neighborRooms[index];
+            transform.position = currentRoom.transform.position;
+            if (charcter_ID < currentRoom.GetComponent<gameRoom>().characterPositions.Length)
+            {
+                transform.position += (currentRoom.GetComponent<gameRoom>().characterPositions)[charcter_ID];
+            }
+
         }
     }
    // returns the index of the neigboring room the ray is hitting. If its not a neighboring room, returns -1
