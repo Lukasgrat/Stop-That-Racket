@@ -33,6 +33,9 @@ public class Level_Manager : MonoBehaviour
 
     public TMP_Text turn;
 
+    private int nextTurnEnemyHealth;
+
+
     [System.NonSerialized]
     public int currentAP;
     [System.NonSerialized]
@@ -54,10 +57,16 @@ public class Level_Manager : MonoBehaviour
         currentAP = MAX_AP;
         currentTurn = 1;
         currentPlayer = 0;
+        nextTurnEnemyHealth = 0;
         increase_AP(-1* currentAP);
+
+
         endTurnButton.onClick.AddListener(nextTurn);
         resetMovesButton.onClick.AddListener(resetMoves);
         ToggleMovesButton.onClick.AddListener(toggleMoves);
+
+
+
         frontLineMoves.SetActive(false);
         wizardMoves.SetActive(false);
     }
@@ -70,14 +79,18 @@ public class Level_Manager : MonoBehaviour
         }
         else 
         { 
-            update_AP(currentAP + num); 
+            set_AP(currentAP + num); 
             return true;
         }
     }
-    void update_AP(int num)
+    void set_AP(int num)
     {
         currentAP = num;
         AP_TEXT.text = "AP:" + currentAP.ToString();
+    }
+    public void set_nextTurnEnemyIncreaseHealth(int num)
+    {
+        nextTurnEnemyHealth = num;
     }
     void nextTurn() 
     {
@@ -87,6 +100,8 @@ public class Level_Manager : MonoBehaviour
             currentPlayer = 0;
             currentTurn += 1;
             turn.text = "Turn " + currentTurn.ToString();
+            increaseEnemyHealth(nextTurnEnemyHealth);
+            nextTurnEnemyHealth = 0;
         }
         else
         {
@@ -122,7 +137,7 @@ public class Level_Manager : MonoBehaviour
     }
     public void resetAP()
     {
-        update_AP(MAX_AP);
+        set_AP(MAX_AP);
     }
     //increases the player's health by num, capping at MAX_PLAYER_HEALTH and 0. Returns whether the player is dead or not
     public bool increasePlayerHealth(int num)

@@ -20,6 +20,7 @@ public class pieceTest : MonoBehaviour
         m_Camera = Camera.main;
         isSelected = false;
         currentRoom = initialRoom;
+        moveToCurrentRoom();
     }
 
     // Update is called once per frame
@@ -63,12 +64,16 @@ public class pieceTest : MonoBehaviour
         if (index != -1 && LevelManager.GetComponent<Level_Manager>().increase_AP(-1))
         {
             currentRoom = currentRoom.GetComponent<gameRoom>().neighborRooms[index];
-            transform.position = currentRoom.transform.position;
-            if (charcter_ID < currentRoom.GetComponent<gameRoom>().characterPositions.Length)
-            {
-                transform.position += (currentRoom.GetComponent<gameRoom>().characterPositions)[charcter_ID];
-            }
-
+            moveToCurrentRoom();
+        }
+    }
+    // Moves the player to their current identified room
+    void moveToCurrentRoom()
+    {
+        transform.position = currentRoom.transform.position;
+        if (charcter_ID < currentRoom.GetComponent<gameRoom>().characterPositions.Length)
+        {
+            transform.position += (currentRoom.GetComponent<gameRoom>().characterPositions)[charcter_ID];
         }
     }
    // returns the index of the neigboring room the ray is hitting. If its not a neighboring room, returns -1
