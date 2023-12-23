@@ -21,6 +21,8 @@ public class moveHandler : MonoBehaviour
     public Button bombardShortButton;
     public Button bombardLongButton;
     public Button fireballButton;
+    public Button teleportButton;
+
 
 
     [System.NonSerialized]
@@ -36,6 +38,7 @@ public class moveHandler : MonoBehaviour
         bombardShortButton.onClick.AddListener(bombardShort);
         bombardLongButton.onClick.AddListener(bombardLong);
         fireballButton.onClick.AddListener(fireBall);
+        teleportButton.onClick.AddListener(teleportInitializeUI);
         fireBallsLeft = 2;
         forceFields = 2;
         stuntsLeft = 2;
@@ -45,7 +48,7 @@ public class moveHandler : MonoBehaviour
     {
         GameObject currentRoom1 = pieces[piece1].GetComponent<pieceTest>().currentRoom;
         GameObject currentRoom2 = pieces[piece2].GetComponent<pieceTest>().currentRoom;
-        return currentRoom1 == currentRoom2;
+        return currentRoom1.name == currentRoom2.name;
     }
     //Given a room and an index of a piece, returns if the given piece is in that room
     bool isPieceInRoom(int index, GameObject room)
@@ -56,13 +59,13 @@ public class moveHandler : MonoBehaviour
     }
     void bombardShort()
     {
-        int currentPlayerIndex = LevelManager.GetComponent<Level_Manager>().currentPlayer;
+        int currentPlayerIndex = levelScript.currentPlayer;
         bool isCannon1 = isPieceInRoom(currentPlayerIndex, shortCannon1);
         bool isCannon2 = isPieceInRoom(currentPlayerIndex, shortCannon2);
         if (isCannon1 || isCannon2) { 
-            if (LevelManager.GetComponent<Level_Manager>().increase_AP(-2))
+            if (levelScript.increase_AP(-2))
             {
-                LevelManager.GetComponent<Level_Manager>().increaseEnemyHealth(-10);
+                levelScript.increaseEnemyHealth(-10);
                 int otherFrontline = 3;
                 if(currentPlayerIndex == 3)
                 {
@@ -71,21 +74,21 @@ public class moveHandler : MonoBehaviour
                 if((isCannon1 && isPieceInRoom(otherFrontline, shortCannon2)) || 
                     (isCannon2 && isPieceInRoom(otherFrontline, shortCannon1)))
                 {
-                    LevelManager.GetComponent<Level_Manager>().increaseEnemyHealth(-5);
+                    levelScript.increaseEnemyHealth(-5);
                 }
             }
         }
     }
     void bombardLong()
     {
-        int currentPlayerIndex = LevelManager.GetComponent<Level_Manager>().currentPlayer;
+        int currentPlayerIndex = levelScript.currentPlayer;
         bool isCannon1 = isPieceInRoom(currentPlayerIndex, longCannon1);
         bool isCannon2 = isPieceInRoom(currentPlayerIndex, longCannon2);
         if (isCannon1 || isCannon2)
         {
-            if (LevelManager.GetComponent<Level_Manager>().increase_AP(-2))
+            if (levelScript.increase_AP(-2))
             {
-                LevelManager.GetComponent<Level_Manager>().increaseEnemyHealth(-5);
+                levelScript.increaseEnemyHealth(-5);
                 int otherFrontline = 3;
                 if (currentPlayerIndex == 3)
                 {
@@ -94,18 +97,33 @@ public class moveHandler : MonoBehaviour
                 if ((isCannon1 && isPieceInRoom(otherFrontline, longCannon2)) ||
                     (isCannon2 && isPieceInRoom(otherFrontline, longCannon1)))
                 {
-                    LevelManager.GetComponent<Level_Manager>().increaseEnemyHealth(-5);
+                    levelScript.increaseEnemyHealth(-5);
                 }
             }
         }
     }
     void fireBall()
     {
-        int currentPlayerIndex = LevelManager.GetComponent<Level_Manager>().currentPlayer;
-        if (isPieceInRoom(currentPlayerIndex, wizardTower) && LevelManager.GetComponent<Level_Manager>().increase_AP(-2))
+        int currentPlayerIndex = levelScript.currentPlayer;
+        if (isPieceInRoom(currentPlayerIndex, wizardTower) && levelScript.increase_AP(-2))
         {
-            LevelManager.GetComponent<Level_Manager>().increaseEnemyHealth(-5);
-            LevelManager.GetComponent<Level_Manager>().set_nextTurnEnemyIncreaseHealth(-5);
+            levelScript.increaseEnemyHealth(-5);
+            levelScript.set_nextTurnEnemyIncreaseHealth(-5);
         }
     }
+    void teleportInitializeUI()
+    {
+        levelScript.clearMoveUI();
+        List<int> IDList = new List<int>();
+        for(int x = 1; x < levelScript.playerCount; x++)
+        {
+            if (areInRoomTogether(0, x))
+            {
+                Debug.Log(x);
+                IDList.Add(x);
+            }
+        }
+        levelScript.setSelectPieceUI(IDList);
+    }
+    void teleport
 }

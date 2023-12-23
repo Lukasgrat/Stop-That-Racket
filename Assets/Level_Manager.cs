@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
-
+using System.Linq;
 public class Level_Manager : MonoBehaviour
 {
     public const int MAX_AP = 2;
@@ -20,7 +20,6 @@ public class Level_Manager : MonoBehaviour
     public Slider healthBarEnemy;
     public TMP_Text enemyHealthText;
     public TMP_Text currentEnemyText;
-    public string[] pieceNames;
     public Button ToggleMovesButton;
 
 
@@ -29,6 +28,8 @@ public class Level_Manager : MonoBehaviour
     public GameObject frontLineMoves;
     public GameObject wizardMoves;
 
+    public GameObject selectPieceUI;
+    public GameObject[] selectPieceUIRoles;
 
 
     public TMP_Text turn;
@@ -58,17 +59,13 @@ public class Level_Manager : MonoBehaviour
         currentTurn = 1;
         currentPlayer = 0;
         nextTurnEnemyHealth = 0;
-        increase_AP(-1* currentAP);
-
 
         endTurnButton.onClick.AddListener(nextTurn);
         resetMovesButton.onClick.AddListener(resetMoves);
         ToggleMovesButton.onClick.AddListener(toggleMoves);
 
 
-
-        frontLineMoves.SetActive(false);
-        wizardMoves.SetActive(false);
+        clearMoveUI();
     }
     // decreases AP by 1 and updates AP accordingly. Returns true if it can be done and false if the value is already 0
     public bool increase_AP(int num) 
@@ -207,9 +204,34 @@ public class Level_Manager : MonoBehaviour
         }
         else
         {
-            frontLineMoves.SetActive(false);
-            wizardMoves.SetActive(false);
+            clearMoveUI();
         }
         isMovesActive = !isMovesActive;
+    }
+    public void clearMoveUI()
+    {
+        frontLineMoves.SetActive(false);
+        wizardMoves.SetActive(false);
+        selectPieceUI.SetActive(false);
+    }
+
+    //Given a list of pieceIDs, sets the selection UI containing those IDs
+    public void setSelectPieceUI(List<int> displayingIDS)
+    {
+        Debug.Log(displayingIDS.Count());
+        selectPieceUI.SetActive(true);
+        for(int i = 0; i < playerCount; i++)
+        {
+            if (!(displayingIDS.Contains(i)))
+            {
+                Debug.Log(i);
+                selectPieceUIRoles[i].SetActive(false);
+            }
+            else
+            {
+                selectPieceUIRoles[i].SetActive(true);
+            }
+        }
+        Debug.Log("------------------");
     }
 }
