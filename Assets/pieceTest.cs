@@ -14,11 +14,15 @@ public class pieceTest : MonoBehaviour
     Camera m_Camera;
     [System.NonSerialized]
     public GameObject currentRoom;
+
+    [System.NonSerialized]
+    public bool isNextMoveTeleport;
     // Start is called before the first frame update
     void Start()
     {
         m_Camera = Camera.main;
         isSelected = false;
+        isNextMoveTeleport = false;
         currentRoom = initialRoom;
         moveToCurrentRoom();
     }
@@ -29,6 +33,21 @@ public class pieceTest : MonoBehaviour
         if (Input.GetMouseButtonDown(0) && LevelManager.GetComponent<Level_Manager>().isPiecesTurn(charcter_ID))
         {
             mouseHandler();
+        }
+        else if(Input.GetMouseButtonDown(0) && isNextMoveTeleport)
+        {
+            Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+            RaycastHit2D[] hits = Physics2D.GetRayIntersectionAll(ray, Mathf.Infinity);
+            foreach (var hit in hits)
+            {
+                if (hit.collider.gameObject.GetComponent<gameRoom>() != null && LevelManager.GetComponent<Level_Manager>().increase_AP(-2))
+                {
+                    currentRoom = hit.collider.gameObject;
+                    moveToCurrentRoom();
+                    isNextMoveTeleport = false;
+                    LevelManager.GetComponent<Level_Manager>().clearMoveUI();
+                }
+            }
         }
     }
     void mouseHandler()

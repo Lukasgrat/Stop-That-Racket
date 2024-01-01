@@ -21,16 +21,16 @@ public class Level_Manager : MonoBehaviour
     public TMP_Text enemyHealthText;
     public TMP_Text currentEnemyText;
     public Button ToggleMovesButton;
-
-
+    public GameObject MoveHandler;
+    public GameObject movementTeleport;
 
 
     public GameObject frontLineMoves;
     public GameObject wizardMoves;
 
     public GameObject selectPieceUI;
-    public GameObject[] selectPieceUIRoles;
-
+    public Button[] selectPieceUIRoles;
+    public string selectPieceMove;
 
     public TMP_Text turn;
 
@@ -63,8 +63,11 @@ public class Level_Manager : MonoBehaviour
         endTurnButton.onClick.AddListener(nextTurn);
         resetMovesButton.onClick.AddListener(resetMoves);
         ToggleMovesButton.onClick.AddListener(toggleMoves);
-
-
+        selectPieceUIRoles[0].onClick.AddListener(delegate { selectPieceHandler(0);});
+        selectPieceUIRoles[1].onClick.AddListener(delegate { selectPieceHandler(1);});
+        selectPieceUIRoles[2].onClick.AddListener(delegate { selectPieceHandler(2);});
+        selectPieceUIRoles[3].onClick.AddListener(delegate { selectPieceHandler(3);});
+        selectPieceUIRoles[4].onClick.AddListener(delegate { selectPieceHandler(4);});
         clearMoveUI();
     }
     // decreases AP by 1 and updates AP accordingly. Returns true if it can be done and false if the value is already 0
@@ -213,25 +216,39 @@ public class Level_Manager : MonoBehaviour
         frontLineMoves.SetActive(false);
         wizardMoves.SetActive(false);
         selectPieceUI.SetActive(false);
+        movementTeleport.SetActive(false);
+        selectPieceMove = "none";
     }
 
     //Given a list of pieceIDs, sets the selection UI containing those IDs
     public void setSelectPieceUI(List<int> displayingIDS)
     {
-        Debug.Log(displayingIDS.Count());
         selectPieceUI.SetActive(true);
-        for(int i = 0; i < playerCount; i++)
+        for(int i = 0; i < selectPieceUIRoles.Length; i++)
         {
             if (!(displayingIDS.Contains(i)))
             {
-                Debug.Log(i);
-                selectPieceUIRoles[i].SetActive(false);
+                selectPieceUIRoles[i].gameObject.SetActive(false);
             }
             else
             {
-                selectPieceUIRoles[i].SetActive(true);
+                selectPieceUIRoles[i].gameObject.SetActive(true);
             }
         }
-        Debug.Log("------------------");
+    }
+
+    public void selectPieceHandler(int index)
+    {
+        string displaycase = selectPieceMove;
+        clearMoveUI();
+        switch (displaycase)
+        {
+            case "teleport":
+                MoveHandler.GetComponent<moveHandler>().teleportLocation(index);
+                movementTeleport.SetActive(true);
+                break;
+            case "inspire":
+                break;
+        }
     }
 }

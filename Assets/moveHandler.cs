@@ -15,8 +15,7 @@ public class moveHandler : MonoBehaviour
     public GameObject diningHall;
     public GameObject longCannon1;
     public GameObject longCannon2;
-    public GameObject wizardTower;
-
+    public GameObject wizardTower; 
 
     public Button bombardShortButton;
     public Button bombardLongButton;
@@ -115,15 +114,20 @@ public class moveHandler : MonoBehaviour
     {
         levelScript.clearMoveUI();
         List<int> IDList = new List<int>();
-        for(int x = 1; x < levelScript.playerCount; x++)
+        for (int x = 1; x < levelScript.playerCount; x++)
         {
             if (areInRoomTogether(0, x))
             {
-                Debug.Log(x);
                 IDList.Add(x);
             }
         }
         levelScript.setSelectPieceUI(IDList);
+        levelScript.selectPieceMove = "teleport";
     }
-    void teleport
+    //Given the index of a piece, sets up the UI for movement and changes the piece's respective next movement flag
+    public void teleportLocation(int x)
+    {
+        Debug.Log(x);
+        pieces[x].GetComponent<pieceTest>().isNextMoveTeleport = true;
+    }
 }
