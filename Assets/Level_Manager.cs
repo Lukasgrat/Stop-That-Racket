@@ -27,6 +27,8 @@ public class Level_Manager : MonoBehaviour
 
     public GameObject frontLineMoves;
     public GameObject wizardMoves;
+    public GameObject captainMoves;
+
 
     public GameObject selectPieceUI;
     public Button[] selectPieceUIRoles;
@@ -43,6 +45,8 @@ public class Level_Manager : MonoBehaviour
     public int currentTurn;
     [System.NonSerialized]
     public int currentPlayer;
+    [System.NonSerialized]
+    public bool isInspire;
 
     [System.NonSerialized]
     public int currentPlayerHealth;
@@ -55,6 +59,7 @@ public class Level_Manager : MonoBehaviour
         currentPlayerHealth = MAX_PLAYER_HEALTH;
         currentEnemyHealth = MAX_ENEMY_HEALTH;
         isMovesActive = false;
+        isInspire = false;
         currentAP = MAX_AP;
         currentTurn = 1;
         currentPlayer = 0;
@@ -95,6 +100,11 @@ public class Level_Manager : MonoBehaviour
     void nextTurn() 
     {
         resetAP();
+        if(isInspire)
+        {
+            currentPlayer = 1;
+            isInspire = false;
+        }
         if(currentPlayer == playerCount - 1)
         {
             currentPlayer = 0;
@@ -107,6 +117,12 @@ public class Level_Manager : MonoBehaviour
         {
             currentPlayer += 1;
         }
+        setPlayerTurnText();
+        frontLineMoves.SetActive(false);
+        wizardMoves.SetActive(false);
+    }
+    void setPlayerTurnText()
+    {
         string playertext = "Current Player: ";
         switch (currentPlayer)
         {
@@ -127,10 +143,7 @@ public class Level_Manager : MonoBehaviour
                 break;
         }
         currentPlayerText.text = playertext;
-        frontLineMoves.SetActive(false);
-        wizardMoves.SetActive(false);
     }
-
     public void resetMoves()
     {
         resetAP();
@@ -204,6 +217,10 @@ public class Level_Manager : MonoBehaviour
             {
                 wizardMoves.SetActive(true);
             }
+            else if (currentPlayer == 1)
+            {
+                captainMoves.SetActive(true);
+            }
         }
         else
         {
@@ -217,6 +234,7 @@ public class Level_Manager : MonoBehaviour
         wizardMoves.SetActive(false);
         selectPieceUI.SetActive(false);
         movementTeleport.SetActive(false);
+        captainMoves.SetActive(false);
         selectPieceMove = "none";
     }
 
@@ -248,6 +266,10 @@ public class Level_Manager : MonoBehaviour
                 movementTeleport.SetActive(true);
                 break;
             case "inspire":
+                isInspire = true;
+                resetAP();
+                currentPlayer = index;
+                setPlayerTurnText();
                 break;
         }
     }

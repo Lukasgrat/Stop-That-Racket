@@ -15,12 +15,14 @@ public class moveHandler : MonoBehaviour
     public GameObject diningHall;
     public GameObject longCannon1;
     public GameObject longCannon2;
-    public GameObject wizardTower; 
+    public GameObject wizardTower;
+    public GameObject commandCenter;
 
     public Button bombardShortButton;
     public Button bombardLongButton;
     public Button fireballButton;
     public Button teleportButton;
+    public Button inspireButton;
 
 
 
@@ -38,6 +40,7 @@ public class moveHandler : MonoBehaviour
         bombardLongButton.onClick.AddListener(bombardLong);
         fireballButton.onClick.AddListener(fireBall);
         teleportButton.onClick.AddListener(teleportInitializeUI);
+        inspireButton.onClick.AddListener(inspireInitializeUI);
         fireBallsLeft = 2;
         forceFields = 2;
         stuntsLeft = 2;
@@ -123,6 +126,20 @@ public class moveHandler : MonoBehaviour
         }
         levelScript.setSelectPieceUI(IDList);
         levelScript.selectPieceMove = "teleport";
+    }
+    void inspireInitializeUI()
+    {
+        levelScript.clearMoveUI();
+        List<int> IDList = new List<int>();
+        for (int x = 0; x < levelScript.playerCount; x++)
+        {
+            if (x != 1 && areInRoomTogether(1, x))
+            {
+                IDList.Add(x);
+            }
+        }
+        levelScript.setSelectPieceUI(IDList);
+        levelScript.selectPieceMove = "inspire";
     }
     //Given the index of a piece, sets up the UI for movement and changes the piece's respective next movement flag
     public void teleportLocation(int x)
