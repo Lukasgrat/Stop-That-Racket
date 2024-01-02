@@ -29,15 +29,20 @@ public class Level_Manager : MonoBehaviour
     public GameObject wizardMoves;
     public GameObject captainMoves;
 
-
+    public TMP_Text distanceText;
+    public int currentDistance;
     public GameObject selectPieceUI;
     public Button[] selectPieceUIRoles;
     public string selectPieceMove;
 
+    public GameObject shipMovementControls;
+
+    public Button toggleSpellsButton;
+    public GameObject wizardSpells;
     public TMP_Text turn;
 
     private int nextTurnEnemyHealth;
-
+    public bool isForceFieldActive;
 
     [System.NonSerialized]
     public int currentAP;
@@ -60,6 +65,7 @@ public class Level_Manager : MonoBehaviour
         currentEnemyHealth = MAX_ENEMY_HEALTH;
         isMovesActive = false;
         isInspire = false;
+        isForceFieldActive = false;
         currentAP = MAX_AP;
         currentTurn = 1;
         currentPlayer = 0;
@@ -68,14 +74,16 @@ public class Level_Manager : MonoBehaviour
         endTurnButton.onClick.AddListener(nextTurn);
         resetMovesButton.onClick.AddListener(resetMoves);
         ToggleMovesButton.onClick.AddListener(toggleMoves);
+        toggleSpellsButton.onClick.AddListener(toggleSpells);
         selectPieceUIRoles[0].onClick.AddListener(delegate { selectPieceHandler(0);});
         selectPieceUIRoles[1].onClick.AddListener(delegate { selectPieceHandler(1);});
         selectPieceUIRoles[2].onClick.AddListener(delegate { selectPieceHandler(2);});
         selectPieceUIRoles[3].onClick.AddListener(delegate { selectPieceHandler(3);});
         selectPieceUIRoles[4].onClick.AddListener(delegate { selectPieceHandler(4);});
         clearMoveUI();
+        setDistanceText();
     }
-    // decreases AP by 1 and updates AP accordingly. Returns true if it can be done and false if the value is already 0
+    // increases AP by num and updates AP accordingly. Returns true if it can be done and false if the value is already 0
     public bool increase_AP(int num) 
     {
         if (currentAP + num < 0)
@@ -144,6 +152,33 @@ public class Level_Manager : MonoBehaviour
         }
         currentPlayerText.text = playertext;
     }
+    // increases the distance by num and updates AP accordingly. Returns whether the value becomes 0
+    public bool increase_distance(int num)
+    {
+        currentDistance = currentDistance + num;
+        if (currentDistance <= 0)
+        {
+            currentDistance = 0;
+            setDistanceText();
+            return true;
+        }
+        else
+        {
+            setDistanceText();
+            return false;
+        }
+    }
+    void setDistanceText()
+    {
+        if (currentDistance == 1)
+        {
+            distanceText.text = "You are " + currentDistance + " Lightyear away from Dr. Racket.";
+        }
+        else
+        {
+            distanceText.text = "You are " + currentDistance + " Lightyears away from Dr. Racket.";
+        }
+    }
     public void resetMoves()
     {
         resetAP();
@@ -155,7 +190,12 @@ public class Level_Manager : MonoBehaviour
     //increases the player's health by num, capping at MAX_PLAYER_HEALTH and 0. Returns whether the player is dead or not
     public bool increasePlayerHealth(int num)
     {
-        if(currentPlayerHealth + num <= 0)
+        if (isForceFieldActive)
+        {
+            isForceFieldActive = false;
+            num /= 2;
+        }
+        if (currentPlayerHealth + num <= 0)
         {
             alterPlayerHealth(0);
             return true;
@@ -228,6 +268,14 @@ public class Level_Manager : MonoBehaviour
         }
         isMovesActive = !isMovesActive;
     }
+    public void toggleMovement()
+    {
+        shipMovementControls.SetActive(!shipMovementControls.activeSelf);
+    }
+    public void toggleSpells()
+    {
+        wizardSpells.SetActive(!wizardSpells.activeSelf);
+    }
     public void clearMoveUI()
     {
         frontLineMoves.SetActive(false);
@@ -235,6 +283,8 @@ public class Level_Manager : MonoBehaviour
         selectPieceUI.SetActive(false);
         movementTeleport.SetActive(false);
         captainMoves.SetActive(false);
+        shipMovementControls.SetActive(false);
+        wizardSpells.SetActive(false);
         selectPieceMove = "none";
     }
 

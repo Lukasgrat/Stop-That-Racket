@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
-
+using TMPro;
 
 public class moveHandler : MonoBehaviour
 {
@@ -21,17 +21,22 @@ public class moveHandler : MonoBehaviour
     public Button bombardShortButton;
     public Button bombardLongButton;
     public Button fireballButton;
+    public Button forcefieldButton;
     public Button teleportButton;
     public Button inspireButton;
-
-
+    public Button moveForward;
+    public Button moveBackward;
+    public Button setSailsButton;
 
     [System.NonSerialized]
     public int fireBallsLeft;
+    public TMP_Text fireBallsLeftText;
     [System.NonSerialized]
-    public int forceFields;
+    public int forceFieldsLeft;
+    public TMP_Text forceFieldsLeftText;
     [System.NonSerialized]
     public int stuntsLeft;
+    public TMP_Text stuntsLeftText;
     void Start()
     {
         levelScript = LevelManager.GetComponent<Level_Manager>();
@@ -39,11 +44,16 @@ public class moveHandler : MonoBehaviour
         bombardShortButton.onClick.AddListener(bombardShort);
         bombardLongButton.onClick.AddListener(bombardLong);
         fireballButton.onClick.AddListener(fireBall);
+        forcefieldButton.onClick.AddListener(forceField);
         teleportButton.onClick.AddListener(teleportInitializeUI);
         inspireButton.onClick.AddListener(inspireInitializeUI);
+        setSailsButton.onClick.AddListener(setSail);
+        moveForward.onClick.AddListener(delegate { move(-1); });
+        moveBackward.onClick.AddListener(delegate { move(1); });
         fireBallsLeft = 2;
-        forceFields = 2;
+        forceFieldsLeft = 2;
         stuntsLeft = 2;
+
     }
     //Given the indexes of two pieces, returns whether or not they are in the same room
     bool areInRoomTogether(int piece1, int piece2)
@@ -106,11 +116,29 @@ public class moveHandler : MonoBehaviour
     }
     void fireBall()
     {
-        int currentPlayerIndex = levelScript.currentPlayer;
-        if (isPieceInRoom(currentPlayerIndex, wizardTower) && levelScript.increase_AP(-2))
+
+        Debug.Log(fireBallsLeft > 0);
+        Debug.Log((isPieceInRoom(levelScript.currentPlayer, longCannon1) || isPieceInRoom(levelScript.currentPlayer, longCannon2)));
+        if (fireBallsLeft > 0 
+            &&  (isPieceInRoom(levelScript.currentPlayer, longCannon1) || isPieceInRoom(levelScript.currentPlayer, longCannon2))
+            && levelScript.increase_AP(-2))
         {
+            Debug.Log("Here");
             levelScript.increaseEnemyHealth(-5);
             levelScript.set_nextTurnEnemyIncreaseHealth(-5);
+            fireBallsLeft -= 1;
+            fireBallsLeftText.text = "Fireballs left: " + fireBallsLeft;
+        }
+    }
+    void forceField()
+    {
+        if (forceFieldsLeft > 0
+            && (isPieceInRoom(levelScript.currentPlayer, wizardTower))
+            && levelScript.increase_AP(-2))
+        {
+            levelScript.isForceFieldActive = true;
+            forceFieldsLeft -= 1;
+            forceFieldsLeftText.text = "Forcefields left: " + forceFieldsLeft;
         }
     }
     void teleportInitializeUI()
@@ -144,7 +172,27 @@ public class moveHandler : MonoBehaviour
     //Given the index of a piece, sets up the UI for movement and changes the piece's respective next movement flag
     public void teleportLocation(int x)
     {
-        Debug.Log(x);
         pieces[x].GetComponent<pieceTest>().isNextMoveTeleport = true;
+    }
+    void move(int x)
+    {
+        if (levelScript.increase_AP(-1) && levelScript.currentDistance != 0)
+        {
+            if (areInRoomTogether(1, 2)){
+                levelScript.increase_distance(x * 2);
+            }
+            else
+            {
+                levelScript.increase_distance(x);
+            }
+        }
+    }
+    void setSail()
+    {
+
+        if (isPieceInRoom(1, commandCenter))
+        {
+            levelScript.toggleMovement();
+        }
     }
 }
