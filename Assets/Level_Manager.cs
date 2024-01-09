@@ -4,6 +4,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
 using System.Linq;
+using System;
 public class Level_Manager : MonoBehaviour
 {
     public const int MAX_AP = 2;
@@ -58,9 +59,14 @@ public class Level_Manager : MonoBehaviour
     [System.NonSerialized]
     public int currentEnemyHealth;
     private bool isMovesActive;
+    [System.NonSerialized]
+    public List<Action> cardFunctions;
+    public GameObject[] cardsDisplay;
+    public Button clearCardButton;
     // Start is called before the first frame update
     void Start()
     {
+        cardFunctions.Add(standardFire);
         currentPlayerHealth = MAX_PLAYER_HEALTH;
         currentEnemyHealth = MAX_ENEMY_HEALTH;
         isMovesActive = false;
@@ -126,8 +132,8 @@ public class Level_Manager : MonoBehaviour
             currentPlayer += 1;
         }
         setPlayerTurnText();
-        frontLineMoves.SetActive(false);
-        wizardMoves.SetActive(false);
+        clearMoveUI();
+        dealEnemyCard();
     }
     void setPlayerTurnText()
     {
@@ -321,6 +327,39 @@ public class Level_Manager : MonoBehaviour
                 currentPlayer = index;
                 setPlayerTurnText();
                 break;
+        }
+    }
+    public void dealEnemyCard()
+    {
+        int rndIndex = UnityEngine.Random.Range(0, cardFunctions.Count);
+        displayCard(rndIndex);
+        cardFunctions[rndIndex]();
+    }
+    public void standardFire()
+    {
+        if (currentDistance < 5)
+        {
+            increasePlayerHealth(-10);
+        }
+        else
+        {
+            increase_distance(-1);
+        }
+    }
+    //Given the index of the card, clears the rest of the cards and displays that index, if the index is -1, clears all cards
+    public void displayCard(int index)
+    {
+        for (int i = 0; i < cardFunctions.Count; i++)
+        {
+            cardsDisplay[i].SetActive(i == index);
+        }
+        if(index == -1)
+        {
+            clearCardButton.gameObject.SetActive(false);
+        }
+        else
+        {
+            clearCardButton.gameObject.SetActive(true);
         }
     }
 }
